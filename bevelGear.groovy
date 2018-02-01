@@ -62,5 +62,8 @@ List<Object> makeBevelBox(double numDriveTeeth, double numDrivenTeeth,Number thi
 	return [gearA.get(0).rotz(bangle/2),gearBFinal,aDiam ,bDiam,axelAngle,face]
 }
 
-double toothBaseArchLen = (26.15/2)*((360.0)/24)*Math.PI/180*4
-return makeBevelBox(40,24,6,toothBaseArchLen)
+if(args == null){
+	args = [40,24,6,((26.15/2)*((360.0)/24)*Math.PI/180*4)]
+}
+
+return makeBevelBox(args)
