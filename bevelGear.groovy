@@ -8,6 +8,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	double topDiamOffset = thickness/(Math.tan(Math.toRadians(bevelAngle)))
 	double topDiam = baseDiam-topDiamOffset*2
 	double baseThickness = toothBaseArchLen/Math.PI
+	thickness-=baseThickness
 	double baseDiamLower = baseDiam-(baseThickness*2)
 	double totalThickness = thickness+baseThickness
 	double toothDepth = baseThickness*1.5
@@ -59,7 +60,7 @@ List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thi
 }
 
 if(args == null){
-	args = [40,24,6,((26.15/2)*((360.0)/24)*Math.PI/180*4)]
+	args = [24,24,3,((26.15/2)*((360.0)/24)*Math.PI/180)]
 }
 
 return makeBevelBox(args)
