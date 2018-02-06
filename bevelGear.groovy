@@ -55,8 +55,7 @@ Number toothBaseArchLen,
 double axelAngle = 90,
 double helical=0,
 Number meshInterference = null){
-	if(axelAngle>100)axelAngle=100
-	
+	if(axelAngle>90)axelAngle=90
 	if(axelAngle<0)axelAngle=0
 	double baseThickness = toothBaseArchLen/Math.PI
 	axelAngle=Math.toRadians(axelAngle)
@@ -94,7 +93,7 @@ Number meshInterference = null){
 	CSG bevelShaftB = shaft.roty(90-Math.toDegrees(bevelAngleB))
 					.movex(gearB.get(1))
 					.rotz(180)
-	CSG gearBFinal = gearB.get(0)
+	CSG gearBFinal = gearB.get(0).rotz(bangle)
 					//.union(shaft)
 					//.union(bevelShaftB)
 					.roty(Math.toDegrees(axelAngle))
@@ -102,6 +101,7 @@ Number meshInterference = null){
 					.movez(bDiam)
 					.rotz(180)
 	CSG gearAFinal = gearA.get(0)//.union(shaft).union(bevelShaft)
+					
 	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face]
 }
 double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
