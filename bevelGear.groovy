@@ -1,20 +1,21 @@
 List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen ){
 	double toothAngle = (360.0)/numTeeth
-	
+	double baseThickness = toothBaseArchLen/Math.PI
+	thickness-=baseThickness
 	double baseDiam = (toothBaseArchLen*numTeeth)/Math.PI
 	//double otherTeeth = (1.0/ratio)*numTeeth
 	//double bevelAngle = Math.toDegrees(Math.atan2(otherTeeth,numTeeth))
 
 	double topDiamOffset = thickness/(Math.tan(Math.toRadians(bevelAngle)))
 	double topDiam = baseDiam-topDiamOffset*2
-	double baseThickness = toothBaseArchLen/Math.PI
+	
 	//thickness-=baseThickness
 	double baseDiamLower = baseDiam-(baseThickness*2)
 	double totalThickness = thickness+baseThickness
 	double toothDepth = baseThickness*1.5
 	//println "Tooth Angle " +toothAngle+" tooth baseArchLen "+toothBaseArchLen+" base Diam "+ baseDiam+" top diam "+topDiam+" thickness "+thickness+" toothInset "+topDiamOffset
 	//println "Tooth num " +numTeeth+" other "+otherTeeth+" angle "+bevelAngle
-	CSG upperSection =new Cylinder(baseDiam/2,topDiam/2,thickness-baseThickness,(int)numTeeth).toCSG() // a one line Cylinder
+	CSG upperSection =new Cylinder(baseDiam/2,topDiam/2,thickness,(int)numTeeth).toCSG() // a one line Cylinder
 	CSG lowerSection =new Cylinder(baseDiamLower/2,baseDiam/2,baseThickness,(int)numTeeth).toCSG() // a one line Cylinder
 					.toZMax()
 	CSG blank = upperSection.union(lowerSection)
@@ -60,7 +61,7 @@ List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thi
 }
 
 if(args == null){
-	args = [24,30,5,((26.15/2)*((360.0)/24)*Math.PI/180)]
+	args = [24,30,4.9,((26.15/2)*((360.0)/24)*Math.PI/180)]
 }
 
 return makeBevelBox(args)
