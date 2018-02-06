@@ -38,7 +38,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	return [blank,baseDiam/2,toothAngle]
 }
 
-List<Object> makeBevelBox(double numDriveTeeth, double numDrivenTeeth,Number thickness,double toothBaseArchLen ){
+List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen ){
 	double axelAngle = 90
 	double bevelAngle = Math.atan2(numDrivenTeeth,numDriveTeeth)
 	double bevelAngleB =(Math.toRadians(axelAngle))-bevelAngle
