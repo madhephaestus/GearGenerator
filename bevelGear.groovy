@@ -10,7 +10,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	double topDiam = baseDiam-topDiamOffset*2
 	
 	//thickness-=baseThickness
-	double baseDiamLower = baseDiam-(baseThickness*2)
+	double baseDiamLower = baseDiam-(baseThickness*2* Math.cos(Math.toRadians(bevelAngle)))
 	double totalThickness = thickness+baseThickness
 	double toothDepth = baseThickness*1.5
 	//println "Tooth Angle " +toothAngle+" tooth baseArchLen "+toothBaseArchLen+" base Diam "+ baseDiam+" top diam "+topDiam+" thickness "+thickness+" toothInset "+topDiamOffset
