@@ -55,7 +55,7 @@ List<Object> makeBevelBox(double numDriveTeeth, double numDrivenTeeth,Number thi
 					.movex(aDiam)
 					.movez(bDiam)
 	
-	return [gearA.get(0).rotz(bangle/2),gearBFinal,aDiam ,bDiam,axelAngle,face]
+	return [gearA.get(0).rotz(bangle/2),gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face]
 }
 
 if(args == null){
