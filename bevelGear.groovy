@@ -1,4 +1,4 @@
-List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen ){
+List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen,double face ){
 	double toothAngle = (360.0)/numTeeth
 	double baseThickness = toothBaseArchLen/Math.PI
 	thickness-=baseThickness
@@ -20,28 +20,33 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 					.toZMax()
 	CSG blank = upperSection.union(lowerSection)
 				.toZMin()
-	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,baseDiam).toCSG()
+	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,face*3).toCSG()
 					.toXMin()
 					.toYMin()
 					.rotz(45)
-					.scaley(0.5)
+					.scaley(0.4)
 					.toZMax()
-					.movez(totalThickness)
+					.movez(face)
 					.movex(-toothDepth)
 					//.movez(thickness)
 					.roty(90-bevelAngle)
 					.movez(totalThickness)
 					.movex(topDiam/2)
-	toothCutter = toothCutter.rotz(-toothAngle/8).union(toothCutter.rotz(toothAngle/8)).hull()
+	double angleScale = 0.125
+	toothCutter = toothCutter.rotz(-toothAngle*angleScale).union(toothCutter.rotz(toothAngle*angleScale)).hull()
 	for(int i=0;i<numTeeth;i++){
 		blank=blank.difference(toothCutter.rotz(toothAngle*i))
 	}
 	
-	return [blank,baseDiam/2,toothAngle,toothDepth]
+	return [blank.rotz(180),baseDiam/2,toothAngle,toothDepth]
 }
 
-List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen, double axelAngle = Math.toRadians(90)){
+List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen, double axelAngle = 90,Number meshInterference = null){
+//	if(axelAngle>100)axelAngle=100
 	
+	if(axelAngle<0)axelAngle=0
+	double baseThickness = toothBaseArchLen/Math.PI
+	axelAngle=Math.toRadians(axelAngle)
 	double bevelTriangleAngle = Math.PI-axelAngle
 	// c² = b² + a² - 2ba cosC
 	double lengthOfBevelCenter  =  Math.sqrt(
@@ -53,37 +58,69 @@ List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thi
 	double Kvalue = numDrivenTeeth*numDriveTeeth*Math.sin(bevelTriangleAngle)/2.0
 	double height = 2*Kvalue/lengthOfBevelCenter
 	
-	double bevelAngleB = Math.acos(height/numDriveTeeth)
-	double bevelAngle =Math.acos(height/numDrivenTeeth)
-	double face  = thickness/Math.sin(bevelAngle)
-	double otherThick = face*Math.sin(bevelAngleB)
 	
-	def gearA = makeGear(numDriveTeeth,thickness,Math.toDegrees(bevelAngle),toothBaseArchLen)
-	def gearB = makeGear(numDrivenTeeth,otherThick,Math.toDegrees(bevelAngleB),toothBaseArchLen)
-	double aDiam = gearB.get(1)*Math.cos(axelAngle)+gearA.get(1)-gearA.get(3)*Math.cos(axelAngle)
+	double bevelAngle =Math.acos(height/numDrivenTeeth)
+	double bevelAngleB = Math.acos(height/numDriveTeeth)
+	double face  = (thickness-baseThickness)/Math.sin(bevelAngle)
+	double otherThick = face*Math.sin(bevelAngleB)+baseThickness
+	
+	//println "\n\nHeight "+(thickness-baseThickness)
+	//println "Face "+face
+	//println "Other Thickness "+otherThick
+	def gearA = makeGear(numDriveTeeth,thickness,Math.toDegrees(bevelAngle),toothBaseArchLen,face)
+	def gearB = makeGear(numDrivenTeeth,otherThick,Math.toDegrees(bevelAngleB),toothBaseArchLen,face)
+	if(meshInterference==null)
+		meshInterference= new Double(gearA.get(3)*Math.cos(axelAngle)*0.75)
+	double aDiam = gearB.get(1)*Math.cos(axelAngle)+
+				gearA.get(1)-meshInterference// mesh interference distance
 	double bDiam = gearB.get(1)*Math.sin(axelAngle)
 	double bangle = gearA.get(2)
+	CSG shaft = new Cylinder(0.1,0.1,50,6).toCSG()
+	CSG bevelShaft = shaft.roty(90-Math.toDegrees(bevelAngle))
+					.movex(gearA.get(1))
+	CSG bevelShaftB = shaft.roty(90-Math.toDegrees(bevelAngleB))
+					.movex(gearB.get(1))
+					.rotz(180)
 	CSG gearBFinal = gearB.get(0)
+					//.union(shaft)
+					//.union(bevelShaftB)
 					.roty(Math.toDegrees(axelAngle))
 					.movex(aDiam)
 					.movez(bDiam)
-	
-	return [gearA.get(0).rotz(bangle/2),gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face]
+	CSG gearAFinal = gearA.get(0)//.union(shaft).union(bevelShaft)
+	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face]
 }
 double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
 }
 
 if(args == null){
-	args = [24,40,5,computeGearPitch(26.15,24),45]
+	args = [41,20,6,computeGearPitch(26.15,24),100]
 }
+
 
 // call a script from another library
 def bevelGears = makeBevelBox(args)
+return bevelGears
 //Print parameters returned by the script
-println "Bevel gear radius A " + bevelGears.get(2)
-println "Bevel gear radius B " + bevelGears.get(3)
+println "Bevel gear axil center to center " + bevelGears.get(2)
+println "Bevel gear axil Height " + bevelGears.get(3)
 println "Bevel angle " + bevelGears.get(4)
 println "Bevel tooth face length " + bevelGears.get(5)
 // return the CSG parts
-return bevelGears
+return [	bevelGears,
+		makeBevelBox([41,21,6,computeGearPitch(26.15,24),0]).collect{
+			try{
+				return it.movey(bevelGears.get(2)*2)
+			}catch(Exception e){
+				return it
+			}
+			},
+		makeBevelBox([41,22,6,computeGearPitch(26.15,24),90]).collect{
+			try{
+				return it.movey(-bevelGears.get(2)*2)
+			}catch(Exception e){
+				return it
+			}
+			},
+]
