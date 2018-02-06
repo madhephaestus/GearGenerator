@@ -42,7 +42,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 }
 
 List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen, double axelAngle = 90,Number meshInterference = null){
-//	if(axelAngle>100)axelAngle=100
+	if(axelAngle>100)axelAngle=100
 	
 	if(axelAngle<0)axelAngle=0
 	double baseThickness = toothBaseArchLen/Math.PI
@@ -94,14 +94,12 @@ double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
 }
 
-if(args == null){
-	args = [41,20,6,computeGearPitch(26.15,24),100]
-}
-
+if(args != null)
+	return makeBevelBox(args)
 
 // call a script from another library
-def bevelGears = makeBevelBox(args)
-return bevelGears
+def bevelGears = makeBevelBox([41,20,6,computeGearPitch(26.15,24),40])
+
 //Print parameters returned by the script
 println "Bevel gear axil center to center " + bevelGears.get(2)
 println "Bevel gear axil Height " + bevelGears.get(3)
@@ -109,7 +107,7 @@ println "Bevel angle " + bevelGears.get(4)
 println "Bevel tooth face length " + bevelGears.get(5)
 // return the CSG parts
 return [	bevelGears,
-		makeBevelBox([41,21,6,computeGearPitch(26.15,24),0]).collect{
+		makeBevelBox([41,21,6,computeGearPitch(26.15,24),-10]).collect{
 			try{
 				return it.movey(bevelGears.get(2)*2)
 			}catch(Exception e){
