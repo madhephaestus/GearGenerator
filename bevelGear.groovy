@@ -37,23 +37,34 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 		blank=blank.difference(toothCutter.rotz(toothAngle*i))
 	}
 	
-	return [blank,baseDiam/2,toothAngle]
+	return [blank,baseDiam/2,toothAngle,toothDepth]
 }
 
-List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen ){
-	double axelAngle = 90
-	double bevelAngle = Math.atan2(numDrivenTeeth,numDriveTeeth)
-	double bevelAngleB =(Math.toRadians(axelAngle))-bevelAngle
+List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thickness,Number toothBaseArchLen, double axelAngle = Math.toRadians(90)){
+	
+	double bevelTriangleAngle = Math.PI-axelAngle
+	// c² = b² + a² - 2ba cosC
+	double lengthOfBevelCenter  =  Math.sqrt(
+		Math.pow(numDriveTeeth,2)+
+		Math.pow(numDrivenTeeth,2)-
+		2.0*numDrivenTeeth*numDriveTeeth*Math.cos(bevelTriangleAngle)
+		)
+	//￼￼￼
+	double Kvalue = numDrivenTeeth*numDriveTeeth*Math.sin(bevelTriangleAngle)/2.0
+	double height = 2*Kvalue/lengthOfBevelCenter
+	
+	double bevelAngleB = Math.acos(height/numDriveTeeth)
+	double bevelAngle =Math.acos(height/numDrivenTeeth)
 	double face  = thickness/Math.sin(bevelAngle)
 	double otherThick = face*Math.sin(bevelAngleB)
 	
 	def gearA = makeGear(numDriveTeeth,thickness,Math.toDegrees(bevelAngle),toothBaseArchLen)
 	def gearB = makeGear(numDrivenTeeth,otherThick,Math.toDegrees(bevelAngleB),toothBaseArchLen)
-	double aDiam = gearA.get(1)
-	double bDiam = gearB.get(1)
+	double aDiam = gearB.get(1)*Math.cos(axelAngle)+gearA.get(1)-gearA.get(3)*Math.cos(axelAngle)
+	double bDiam = gearB.get(1)*Math.sin(axelAngle)
 	double bangle = gearA.get(2)
 	CSG gearBFinal = gearB.get(0)
-					.roty(axelAngle)
+					.roty(Math.toDegrees(axelAngle))
 					.movex(aDiam)
 					.movez(bDiam)
 	
@@ -64,6 +75,15 @@ double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 }
 
 if(args == null){
-	args = [24,30,4.9,computeGearPitch(26.15,24)]
+	args = [24,40,5,computeGearPitch(26.15,24),45]
 }
-return makeBevelBox(args)
+
+// call a script from another library
+def bevelGears = makeBevelBox(args)
+//Print parameters returned by the script
+println "Bevel gear radius A " + bevelGears.get(2)
+println "Bevel gear radius B " + bevelGears.get(3)
+println "Bevel angle " + bevelGears.get(4)
+println "Bevel tooth face length " + bevelGears.get(5)
+// return the CSG parts
+return bevelGears
