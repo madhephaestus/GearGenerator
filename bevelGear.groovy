@@ -1,7 +1,3 @@
-//Your code here
-
-
-
 List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen ){
 	double toothAngle = (360.0)/numTeeth
 	
