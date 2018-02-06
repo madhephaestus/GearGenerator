@@ -14,7 +14,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	double totalThickness = thickness+baseThickness
 	double toothDepth = baseThickness*1.5
 	//println "Tooth Angle " +toothAngle+" tooth baseArchLen "+toothBaseArchLen+" base Diam "+ baseDiam+" top diam "+topDiam+" thickness "+thickness+" toothInset "+topDiamOffset
-	println " angle "+bevelAngle
+	//println " angle "+bevelAngle
 	CSG upperSection =new Cylinder(baseDiam/2,topDiam/2,thickness,(int)numTeeth).toCSG() // a one line Cylinder
 	CSG lowerSection =new Cylinder(baseDiamLower/2,baseDiam/2,baseThickness,(int)numTeeth).toCSG() // a one line Cylinder
 					.toZMax()
