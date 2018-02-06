@@ -59,9 +59,11 @@ List<Object> makeBevelBox(Number numDriveTeeth, Number numDrivenTeeth,Number thi
 	
 	return [gearA.get(0).rotz(bangle/2),gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face]
 }
-
-if(args == null){
-	args = [24,30,4.9,((26.15/2)*((360.0)/24)*Math.PI/180)]
+double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
+	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
 }
 
+if(args == null){
+	args = [24,30,4.9,computeGearPitch(26.15,24)]
+}
 return makeBevelBox(args)
