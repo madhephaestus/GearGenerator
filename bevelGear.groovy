@@ -86,14 +86,16 @@ Number meshInterference = null){
 	double aDiam = gearB.get(1)*Math.cos(axelAngle)+
 				gearA.get(1)-meshInterference// mesh interference distance
 	double bDiam = gearB.get(1)*Math.sin(axelAngle)
-	double bangle = gearA.get(2)
+	double bangle = gearB.get(2)
+	//println bangle
 	CSG shaft = new Cylinder(0.1,0.1,50,6).toCSG()
 	CSG bevelShaft = shaft.roty(90-Math.toDegrees(bevelAngle))
 					.movex(gearA.get(1))
 	CSG bevelShaftB = shaft.roty(90-Math.toDegrees(bevelAngleB))
 					.movex(gearB.get(1))
 					.rotz(180)
-	CSG gearBFinal = gearB.get(0).rotz(bangle)
+	CSG gearBFinal = gearB.get(0)
+					.rotz(bangle/2)
 					//.union(shaft)
 					//.union(bevelShaftB)
 					.roty(Math.toDegrees(axelAngle))
@@ -128,7 +130,7 @@ return [	bevelGears,
 				return it
 			}
 			},
-		makeBevelBox([41,22,6,computeGearPitch(26.15,24),90,helical]).collect{
+		makeBevelBox([41,22,4,computeGearPitch(26.15,24),90,helical]).collect{
 			try{
 				return it.movey(-bevelGears.get(2)*2)
 			}catch(Exception e){
