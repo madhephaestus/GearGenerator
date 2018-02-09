@@ -8,7 +8,7 @@ if(args == null){
 			Vitamins.get("ballBearing","R8-60355K505"),// bearing CSG
 			computeGearPitch(26.15,24),// gear pitch in arc length mm
 			90,// output shaft angle
-			30.0,// gear ratio
+			3.0,// gear ratio
 			4,// number of stages
 			true// extend shaft out the back
 			]
