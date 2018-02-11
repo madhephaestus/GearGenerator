@@ -8,7 +8,7 @@ if(args == null){
 			Vitamins.get("ballBearing","R8-60355K505"),// bearing CSG
 			computeGearPitch(26.15,24)*2,// gear pitch in arc length mm
 			90,// output shaft angle
-			3,// gear ratio
+			5,// gear ratio
 			1,// number of stages
 			true// extend shaft out the back
 			]
@@ -27,6 +27,7 @@ double ratioPerStage
 int additionalTeeth
 int numTeeth
 int numTeethSecond
+double gearThickness = bearing.getTotalZ()
 
 while(true ){
 	ratioPerStage =((ratio)/numberOfStages)
@@ -47,18 +48,48 @@ numTeethSecond = additionalTeeth
 
 println ratioPerStage+" ratio on each "+numberOfStages+" Gear sets "+numTeeth+" to "+additionalTeeth
 
-def mainGears = ScriptingEngine.gitScriptRun(
+def finalGears = ScriptingEngine.gitScriptRun(
             "https://github.com/madhephaestus/GearGenerator.git", // git location of the library
             "bevelGear.groovy" , // file to load
             // Parameters passed to the funcetion
             [	  numTeeth,// Number of teeth gear a
 	            numTeethSecond,// Number of teeth gear b
-	            6,// thickness of gear A
+	           gearThickness,// thickness of gear A
 	           pitch,// gear pitch in arc length mm
 	           shaftAngle,// shaft angle, can be from 0 to 100 degrees
-	            0// helical angle, only used for 0 degree bevels
             ]
             )
+CSG outputGear=finalGears.get(1)
+CSG driveOutputGear=finalGears.get(0)
+def gears = [outputGear]
+CSG perviousInput=driveOutputGear
+for(int i=1;i<numberOfStages;i++){
+	def stage = ScriptingEngine.gitScriptRun(
+            "https://github.com/madhephaestus/GearGenerator.git", // git location of the library
+            "bevelGear.groovy" , // file to load
+            // Parameters passed to the funcetion
+            [	  numTeeth,// Number of teeth gear a
+	            numTeethSecond,// Number of teeth gear b
+	           gearThickness,// thickness of gear A
+	           pitch,// gear pitch in arc length mm
+	           0,// shaft angle, can be from 0 to 100 degrees
+            ]
+            )
+    boolean odd = i%2>0.001
+    
+    CSG d=stage.get(0)
+    			.movez(-gearThickness*i)
+    CSG o=stage.get(1)
+    			.movez(-gearThickness*i)
+    double center = stage.get(2)
+    if(odd){
+    	d=d.movex(-center)
+    	o=o.movex(center)
+    }
+    gears.add(perviousInput.union(o))
 
+    perviousInput=d
+}
+gears.add(perviousInput)
 
-return [bearing,mainGears]
+return gears
