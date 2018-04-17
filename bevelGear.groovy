@@ -124,6 +124,7 @@ println "Bevel gear axil center to center " + bevelGears.get(2)
 println "Bevel gear axil Height " + bevelGears.get(3)
 println "Bevel angle " + bevelGears.get(4)
 println "Bevel tooth face length " + bevelGears.get(5)
+println "Gear B computed thickness " + bevelGears.get(6)
 // return the CSG parts
 return [	bevelGears,
 		makeBevelBox([42,20,6,computeGearPitch(26.15,24),0,helical]).collect{
