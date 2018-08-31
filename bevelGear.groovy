@@ -22,20 +22,20 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 				.toZMin()
 	if(bevelAngle<90)
 		helical=0
-	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,face*4).toCSG()
+	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,face+thickness).toCSG()
 					.toXMin()
 					.toYMin()
 					.rotz(45)
 					.scaley(0.4)
 					.toZMax()
-					.movez(face)
+					.movez(thickness/2)
 					.rotx(helical)
 					.movex(-toothDepth)
 					//.movez(thickness)
 					.roty(90-bevelAngle)
 					.movez(totalThickness)
 					.movex(topDiam/2)
-	double angleScale = 0.125
+	double angleScale = 0.2
 	double cutterOffset = toothAngle*angleScale
 	toothCutter = toothCutter.rotz(-cutterOffset).union(toothCutter.rotz(cutterOffset)).hull()
 	for(int i=0;i<numTeeth;i++){
@@ -43,12 +43,12 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	}
 	double pinRadius = ((3/16)*25.4)/2+0.1
 
-double pinLength = (2.5*25.4)
+     double pinLength = (2.5*25.4)
 	CSG hole =new Cylinder(pinRadius,pinRadius,pinLength,(int)30).toCSG().movez(-pinLength/2) // steel reenforcmentPin
 	return [blank.difference(hole)
-	//.union(toothCutter).rotz(toothAngle*numTeeth/4)
+	//.union(toothCutter)//.rotz(toothAngle*numTeeth/4)
 	.rotz(180)
-,baseDiam/2,toothAngle,toothDepth]
+     ,baseDiam/2,toothAngle,toothDepth]
 }
 
 List<Object> makeBevelBox(Number numDriveTeeth, 
@@ -105,7 +105,7 @@ Number meshInterference = null){
 					.movex(aDiam)
 					.movez(bDiam)
 					.rotz(180)
-	CSG gearAFinal = gearA.get(0)//.union(shaft).union(bevelShaft)
+	CSG gearAFinal = gearA.get(0)//.rotz(bangle/4)//.union(shaft).union(bevelShaft)
 	double ratio = (gearA.get(1)-meshInterference)/(gearB.get(1)-meshInterference)
 	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face,otherThick, ratio]
 }
@@ -128,14 +128,14 @@ println "Gear B computed thickness " + bevelGears.get(6)
 println "Gear Ratio " + bevelGears.get(7)
 // return the CSG parts
 return [	bevelGears,
-		makeBevelBox([42,20,6,computeGearPitch(26.15,24),0,helical]).collect{
+		makeBevelBox([42,20,6,computeGearPitch(26.15,24),0,0]).collect{
 			try{
 				return it.movey(bevelGears.get(2)*2)
 			}catch(Exception e){
 				return it
 			}
 			},
-		makeBevelBox([41,22,4,computeGearPitch(26.15,24),90,helical]).collect{
+		makeBevelBox([41,22,4,computeGearPitch(26.15,24),90,0]).collect{
 			try{
 				return it.movey(-bevelGears.get(2)*2)
 			}catch(Exception e){
