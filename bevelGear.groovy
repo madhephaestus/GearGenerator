@@ -22,13 +22,13 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 				.toZMin()
 	if(bevelAngle<90)
 		helical=0
-	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,face+thickness).toCSG()
+	CSG toothCutter = new Cube(toothBaseArchLen,toothBaseArchLen,face+thickness*2).toCSG()
 					.toXMin()
 					.toYMin()
 					.rotz(45)
 					.scaley(0.4)
 					.toZMax()
-					.movez(thickness/2)
+					.movez(thickness*1.5)
 					.rotx(helical)
 					.movex(-toothDepth)
 					//.movez(thickness)
@@ -128,14 +128,14 @@ println "Gear B computed thickness " + bevelGears.get(6)
 println "Gear Ratio " + bevelGears.get(7)
 // return the CSG parts
 return [	bevelGears,
-		makeBevelBox([42,20,6,computeGearPitch(26.15,24),0,0]).collect{
+		makeBevelBox([42,20,6,6,0,0]).collect{
 			try{
 				return it.movey(bevelGears.get(2)*2)
 			}catch(Exception e){
 				return it
 			}
 			},
-		makeBevelBox([41,22,4,computeGearPitch(26.15,24),90,0]).collect{
+		makeBevelBox([41,22,4,6,90,0]).collect{
 			try{
 				return it.movey(-bevelGears.get(2)*2)
 			}catch(Exception e){
