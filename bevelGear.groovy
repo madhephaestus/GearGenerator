@@ -107,7 +107,7 @@ Number meshInterference = null){
 					.rotz(180)
 	CSG gearAFinal = gearA.get(0)//.rotz(bangle/4)//.union(shaft).union(bevelShaft)
 	double ratio = (gearA.get(1)-meshInterference)/(gearB.get(1)-meshInterference)
-	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face,otherThick, ratio]
+	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face,otherThick, ratio,bangle,gearA.get(2)]
 }
 double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
