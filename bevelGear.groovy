@@ -45,7 +45,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 
      double pinLength = (2.5*25.4)
 	CSG hole =new Cylinder(pinRadius,pinRadius,pinLength,(int)30).toCSG().movez(-pinLength/2) // steel reenforcmentPin
-	return [blank.difference(hole)
+	return [blank
 	//.union(toothCutter)//.rotz(toothAngle*numTeeth/4)
 	.rotz(180)
      ,baseDiam/2,toothAngle,toothDepth]
