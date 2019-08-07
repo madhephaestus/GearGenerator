@@ -63,18 +63,48 @@ double calculateToothDepth(double pitch){
 	return pitch/Math.PI*1.5
 }
 
-List<Object>  makeRack(Number linearPitch,Number rackLength,Number toothFace,Number rackTrackCurveAngle=null,def pressureAngle){
+List<Object>  makeRack(Number linearPitch,Number rackLength,Number toothFace,Number rackTrackCurveRadius=null,def pressureAngle){
 	double baseThickness = linearPitch/Math.PI
 	double toothDepth = calculateToothDepth(linearPitch)
-	
-	CSG rackBase = new Cube(1,rackLength,toothFace).toCSG()
+	int numTeeth =(int) (rackLength/linearPitch)
+	CSG rackBase = new Cube(1,linearPitch,toothFace).toCSG()
 				.toZMin()
 				.toXMin()
+				.toYMin()
+				.movey(-linearPitch/2)
 				.movex(toothDepth)
-	
-	
-	
-	return [rackBase ,0,90,toothDepth]
+	double toothFaceLen = (toothDepth*0.9)/Math.cos(Math.toRadians(pressureAngle))
+	CSG toothCutter = new Cube(toothFaceLen,0.1,toothFace).toCSG()
+					.toXMin()
+					.toZMin()
+					.rotz(pressureAngle)
+					.movey(-linearPitch/8)
+	CSG toothCutterB = new Cube(toothFaceLen,0.1,toothFace).toCSG()
+					.toXMin()
+					.toZMin()
+					.rotz(-pressureAngle)
+					.movey(linearPitch/8)				
+	def tooth = CSG.unionAll([toothCutter,	toothCutterB])
+				.movex(toothDepth*0.1)	
+				.hull()
+				.union(rackBase)
+	CSG baseOfAll = tooth.clone()	
+	if(rackTrackCurveRadius==null)	{
+		for(int i=1;i<numTeeth;i++){
+			baseOfAll=baseOfAll.union(tooth.movey(linearPitch*i))
+		}
+	}else{
+		double centralAngle = (linearPitch/(2.0*Math.PI*rackTrackCurveRadius))*360
+		def offsetTooth = tooth.movez(-rackTrackCurveRadius)
+		 baseOfAll = offsetTooth.clone()
+		for(int i=1;i<numTeeth;i++){
+			baseOfAll=baseOfAll.union(offsetTooth
+							.rotx(-centralAngle*i)
+			)
+		}
+		baseOfAll=baseOfAll.movez(rackTrackCurveRadius)
+	}
+	return [baseOfAll ,0,90,toothDepth]
 }
 
 List<Object> makeBevelBox(Number numDriveTeeth, 
@@ -145,7 +175,7 @@ if(args != null)
 	return makeBevelBox(args)
 double helical =20
 // call a script from another library
-def bevelGears = makeBevelBox([42,20,6,6,0,0,null,20,true,null])
+def bevelGears = makeBevelBox([42,20,6,6,0,0,null,20,true,200])
 
 //Print parameters returned by the script
 println "Bevel gear axil center to center " + bevelGears.get(2)
@@ -156,7 +186,7 @@ println "Gear B computed thickness " + bevelGears.get(6)
 println "Gear Ratio " + bevelGears.get(7)
 println "Mesh Interference calculated: " + bevelGears.get(9)
 // return the CSG parts
-//return bevelGears
+return bevelGears
 return [	bevelGears,
 		makeBevelBox([42,20,6,6,0,0]).collect{
 			try{
