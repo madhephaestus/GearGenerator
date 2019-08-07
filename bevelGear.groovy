@@ -1,6 +1,6 @@
 List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen,double face, double helical){
 
-	double pressureAngle = 25
+	double pressureAngle = 20
 	
 	double toothAngle = (360.0)/numTeeth
 	double baseThickness = toothBaseArchLen/Math.PI
@@ -28,34 +28,27 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	CSG toothCutter = new Cube(toothBaseArchLen,0.01,face+thickness*2).toCSG()
 					.toXMin()
 					.toYMin()
-					.movex(-toothDepth)
 					.rotz(pressureAngle)
 	CSG toothCutterMirror = new Cube(toothBaseArchLen,0.01,face+thickness*2).toCSG()
 					.toXMin()
 					.toYMin()
-					.movex(-toothDepth)
 					.rotz(-pressureAngle)
 	def cutters = [toothCutter,toothCutterMirror].collect{
-		it.movex(toothDepth)
-					.toZMax()
-					.movez(thickness*1.5)
-					.rotx(helical)
-					.movex(-toothDepth)
-					//.movez(thickness)
-					.roty(90-bevelAngle)
-					.movez(totalThickness)
-					.movex(topDiam/2)
+		it.toZMax()
+		.movez(thickness*1.5)
+		.rotx(helical)
+		.movex(-toothDepth)
+		.roty(90-bevelAngle)
+		.movez(totalThickness)
+		.movex(topDiam/2)
 	}
 					
-	double angleScale = -0.75
+	double angleScale = -0.2
 	double cutterOffset = toothAngle*angleScale
-	toothCutter = cutters[0].union(
-					cutters[1]
-					.rotz(cutterOffset)
-				)
-				.rotz(-toothAngle/4.0)
+	toothCutter = cutters[0].rotz(-cutterOffset).union(cutters[1].rotz(cutterOffset))
+				//.rotz(-toothAngle/2.0)
 				.hull()
-				.movex(-toothBaseArchLen*0.1)
+				//.movex(-toothBaseArchLen*0.1)
 
 	for(int i=0;i<numTeeth;i++){
 		blank=blank.difference(toothCutter.rotz(toothAngle*i))
@@ -130,9 +123,9 @@ Number rackTrackCurveAngle=null){
 	double bDiam = gearB.get(1)*Math.sin(axelAngle)
 	double bangle = gearB.get(2)
 	//println bangle
-	def rotAngle = (numDriveTeeth%2==0 && numDrivenTeeth%2==0)?1:-1
+	def rotAngle = (numDriveTeeth%2==0 && numDrivenTeeth%2==0)?0:0
 	CSG gearBFinal = gearB.get(0)
-					.rotz(bangle/2+rotAngle*(360.0)/numDrivenTeeth/4.0)
+					//.rotz(bangle/2+rotAngle*(360.0)/numDrivenTeeth/4.0)
 					.roty(Math.toDegrees(axelAngle))
 					.movex(aDiam)
 					.movez(bDiam)
