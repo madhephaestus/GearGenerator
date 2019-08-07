@@ -1,6 +1,6 @@
-List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen,double face, double helical){
+List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen,double face, double helical, def pressureAngle){
 
-	double pressureAngle = 20
+
 	
 	double toothAngle = (360.0)/numTeeth
 	double baseThickness = toothBaseArchLen/Math.PI
@@ -63,7 +63,7 @@ double calculateToothDepth(double pitch){
 	return pitch/Math.PI*1.5
 }
 
-List<Object>  makeRack(Number linearPitch,Number rackLength,Number toothFace,Number rackTrackCurveAngle=null){
+List<Object>  makeRack(Number linearPitch,Number rackLength,Number toothFace,Number rackTrackCurveAngle=null,def pressureAngle){
 	double baseThickness = linearPitch/Math.PI
 	double toothDepth = calculateToothDepth(linearPitch)
 	
@@ -84,6 +84,7 @@ Number toothBaseArchLen,
 double axelAngleDegrees = 90,
 double helical=0,
 Number meshInterference = null,
+Number pressureAngle=null,
 Boolean makeRackFlag=false,
 Number rackTrackCurveAngle=null){
 	if(axelAngleDegrees>90)axelAngleDegrees=90
@@ -106,16 +107,17 @@ Number rackTrackCurveAngle=null){
 	double bevelAngleB = Math.acos(height/numDriveTeeth)
 	double face  = (thickness-baseThickness)/Math.sin(bevelAngle)
 	double otherThick = face*Math.sin(bevelAngleB)+baseThickness
-	
+	if(	 pressureAngle==null)
+		pressureAngle=20
 	//println "\n\nHeight "+(thickness-baseThickness)
 	//println "Face "+face
 	//println "Other Thickness "+otherThick
-	def gearB = makeGear(numDrivenTeeth,otherThick,Math.toDegrees(bevelAngleB),toothBaseArchLen,face,helical)
+	def gearB = makeGear(numDrivenTeeth,otherThick,Math.toDegrees(bevelAngleB),toothBaseArchLen,face,helical,pressureAngle)
 	def gearA;
 	if(makeRackFlag==false)
-		gearA= makeGear(numDriveTeeth,thickness,Math.toDegrees(bevelAngle),toothBaseArchLen,face,-helical)
+		gearA= makeGear(numDriveTeeth,thickness,Math.toDegrees(bevelAngle),toothBaseArchLen,face,-helical,pressureAngle)
 	else
-		gearA=makeRack(toothBaseArchLen,toothBaseArchLen*numDriveTeeth,thickness,rackTrackCurveAngle)
+		gearA=makeRack(toothBaseArchLen,toothBaseArchLen*numDriveTeeth,thickness,rackTrackCurveAngle,pressureAngle)
 	if(meshInterference==null)
 		meshInterference= new Double(gearA.get(3)*Math.cos(axelAngle))
 	double aDiam = gearB.get(1)*Math.cos(axelAngle)+
@@ -143,7 +145,7 @@ if(args != null)
 	return makeBevelBox(args)
 double helical =20
 // call a script from another library
-def bevelGears = makeBevelBox([42,20,6,6,0,0,null,true,null])
+def bevelGears = makeBevelBox([42,20,6,6,0,0,null,20,true,null])
 
 //Print parameters returned by the script
 println "Bevel gear axil center to center " + bevelGears.get(2)
