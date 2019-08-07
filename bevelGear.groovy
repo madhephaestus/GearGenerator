@@ -55,7 +55,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	}
 
 
-	return [blank.union(toothCutter)
+	return [blank//.union(toothCutter)
      ,baseDiam/2,toothAngle,toothDepth]
 }
 
@@ -138,7 +138,7 @@ Number rackTrackCurveAngle=null){
 	double face  = (thickness-baseThickness)/Math.sin(bevelAngle)
 	double otherThick = face*Math.sin(bevelAngleB)+baseThickness
 	if(	 pressureAngle==null)
-		pressureAngle=20
+		pressureAngle=25
 	//println "\n\nHeight "+(thickness-baseThickness)
 	//println "Face "+face
 	//println "Other Thickness "+otherThick
@@ -155,9 +155,9 @@ Number rackTrackCurveAngle=null){
 	double bDiam = gearB.get(1)*Math.sin(axelAngle)
 	double bangle = gearB.get(2)
 	//println bangle
-	def rotAngle = (numDriveTeeth%2==0 && numDrivenTeeth%2==0)?0:0
+	def rotAngle = (numDriveTeeth%2==0 && numDrivenTeeth%2==0)?1:-1
 	CSG gearBFinal = gearB.get(0)
-					//.rotz(bangle/2+rotAngle*(360.0)/numDrivenTeeth/4.0)
+					.rotz(bangle/2*rotAngle)
 					.roty(Math.toDegrees(axelAngle))
 					.movex(aDiam)
 					.movez(bDiam)
