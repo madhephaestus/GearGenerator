@@ -186,7 +186,7 @@ println "Gear B computed thickness " + bevelGears.get(6)
 println "Gear Ratio " + bevelGears.get(7)
 println "Mesh Interference calculated: " + bevelGears.get(9)
 // return the CSG parts
-return bevelGears
+//return bevelGears
 return [	bevelGears,
 		makeBevelBox([42,20,6,6,0,0]).collect{
 			try{
