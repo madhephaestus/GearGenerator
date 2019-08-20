@@ -164,8 +164,23 @@ Number rackTrackCurveAngle=null){
 					.rotz(180)
 
 	CSG gearAFinal = gearA.get(0)
-	double ratio = (gearA.get(1)-meshInterference)/(gearB.get(1)-meshInterference)
-	return [gearAFinal,gearBFinal,aDiam ,bDiam,Math.toDegrees(bevelAngle),face,otherThick, ratio,gearA.get(2),gearB.get(2),meshInterference]
+	double ratio = (gearA.get(1)-meshInterference/2)/(gearB.get(1)-meshInterference/2)
+	return [gearAFinal, //0 A CSG
+	gearBFinal,//1 B CSG
+	aDiam , //2 Center to center in X
+	bDiam,//3 Center to center in Y
+	Math.toDegrees(bevelAngle), //4 Bevel angle in degrees
+	face, //5 length of the face of the gear
+	otherThick, //6 thickness of the computed gear
+	ratio, //7 gear ratio
+	gearA.get(2), //8 angle of A tooth
+	gearB.get(2), //9 angle of B tooth
+	meshInterference, //10 the computed mesh interference
+	gearA.get(1), //11 reference Radius of A gear  
+	gearB.get(1), //12 reference Radius of B gear
+	gearA.get(1)-meshInterference/2, //13 Tip Radius of A gear  
+	gearB.get(1)-meshInterference/2 //14 Tip Radius of B gear
+	]
 }
 double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
@@ -202,3 +217,5 @@ return [	bevelGears,
 				return it
 			}
 			}]
+
+			
