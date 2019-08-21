@@ -138,7 +138,7 @@ Number rackTrackCurveAngle=null){
 	double face  = (thickness-baseThickness)/Math.sin(bevelAngle)
 	double otherThick = face*Math.sin(bevelAngleB)+baseThickness
 	if(	 pressureAngle==null)
-		pressureAngle=25
+		pressureAngle=14.5
 	//println "\n\nHeight "+(thickness-baseThickness)
 	//println "Face "+face
 	//println "Other Thickness "+otherThick
@@ -201,7 +201,7 @@ println "Gear B computed thickness " + bevelGears.get(6)
 println "Gear Ratio " + bevelGears.get(7)
 println "Mesh Interference calculated: " + bevelGears.get(9)
 // return the CSG parts
-//return bevelGears
+return bevelGears
 return [	bevelGears,
 		makeBevelBox([42,20,6,6,0,0]).collect{
 			try{
