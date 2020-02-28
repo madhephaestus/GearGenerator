@@ -1,3 +1,6 @@
+import eu.mihosoft.vrl.v3d.CSG
+import eu.mihosoft.vrl.v3d.Cylinder
+
 double computeGearPitch(double diameterAtCrown,double numberOfTeeth){
 	return ((diameterAtCrown/2)*((360.0)/numberOfTeeth)*Math.PI/180)
 }
