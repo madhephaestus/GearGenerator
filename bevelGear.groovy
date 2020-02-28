@@ -1,6 +1,10 @@
 import java.nio.file.Paths
 
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
+
 import com.neuronrobotics.bowlerstudio.scripting.ScriptingEngine
+import com.neuronrobotics.bowlerstudio.vitamins.Vitamins
 
 import eu.mihosoft.vrl.v3d.CSG
 import eu.mihosoft.vrl.v3d.Cube
@@ -14,7 +18,8 @@ import java.lang.reflect.Type;
 
 List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double toothBaseArchLen,double face, double helical, def pressureAngle){
 
-
+	Type TT_mapStringString = new TypeToken<HashMap<String, HashMap<String, Object>>>() {}.getType();
+	Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 	String cacheName = 	"Gear-"+numTeeth+"-"+
 			thickness+"-"+
 			bevelAngle+"-"+
@@ -30,7 +35,14 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 	File cachejson = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".json")
 	if(cacheSTL.exists() && cachejson.exists()) {
 		println "Loading cached gear "+cacheName
-		
+		CSG gear = Vitamins.get(cacheSTL);
+		String jsonString = null;
+		InputStream inPut = null;
+		inPut = FileUtils.openInputStream(cachejson);
+		jsonString = IOUtils.toString(inPut);
+		HashMap<String, HashMap<String, Object>> database = gson.fromJson(jsonString, TT_mapStringString);
+		HashMap<String, Object> newData = database.get("gearMetaData")
+		return [gear,newData.get("baseRad"),newData.get("toothAngle"),newData.get("toothDepth")]
 	}
 
 
@@ -91,8 +103,7 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 
 	FileUtil.write(Paths.get(cacheSTL.toURI()),
 			blank.toStlString());
-	Type TT_mapStringString = new TypeToken<HashMap<String, HashMap<String, Object>>>() {}.getType();
-	Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+	
 	HashMap<String, HashMap<String, Object>> database= new HashMap<String, HashMap<String, Object>>()
 	HashMap<String, Object> newData = new HashMap<>()
 	newData.put("baseRad",baseDiam/2)
