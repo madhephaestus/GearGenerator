@@ -183,9 +183,60 @@ List<Object> makeBevelBox(Number numDriveTeeth,
 		Boolean makeRackFlag=false,
 		Number rackTrackCurveAngle=null){
 
-
+	Type TT_mapStringString = new TypeToken<HashMap<String, HashMap<String, Object>>>() {}.getType();
+	Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 	if(axelAngleDegrees>90)axelAngleDegrees=90
 	if(axelAngleDegrees<0)axelAngleDegrees=0
+	if(	 pressureAngle==null)pressureAngle=14.5
+	
+	String cacheName = ""+numDriveTeeth+"-"+
+						numDrivenTeeth+"-"+
+						thickness+"-"+
+						toothBaseArchLen+"-"+
+						axelAngleDegrees+"-"+
+						helical+"-"+
+						meshInterference+"-"+
+						pressureAngle+"-"+
+						makeRackFlag+"-"+
+						rackTrackCurveAngle
+	File repoDir= ScriptingEngine.getRepositoryCloneDirectory("https://github.com/madhephaestus/GearGenerator.git")
+	File cacheDir = new File(repoDir.getAbsolutePath()+"/cache/")
+	if(!cacheDir.exists())
+		cacheDir.mkdir()
+	File cacheSTLA = new File(cacheDir.getAbsolutePath()+"/"+cacheName+"-a.stl")
+	File cacheSTLB = new File(cacheDir.getAbsolutePath()+"/"+cacheName+"-b.stl")
+	File cachejson = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".json")
+	if(cacheSTLA.exists() && cacheSTLB.exists() &&cachejson.exists()) {
+		println "Loading cached gears "+cacheName
+		CSG geara = Vitamins.get(cacheSTLA);
+		CSG gearb = Vitamins.get(cacheSTLB);
+		
+		String jsonString = null;
+		InputStream inPut = null;
+		inPut = FileUtils.openInputStream(cachejson);
+		jsonString = IOUtils.toString(inPut);
+		HashMap<String, HashMap<String, Object>> database = gson.fromJson(jsonString, TT_mapStringString);
+		HashMap<String, Object> newData = database.get("gearMetaData")
+		return [geara,
+			gearb,
+			newData.get("gearCenterToCenterX"),
+			newData.get("GearCenterToAxilZ"),
+			newData.get("bevelAngleInDegrees"),
+			newData.get("faceLength"),
+			newData.get("ThicknessOfComputedGear"),
+			newData.get("GearRatio"),
+			newData.get("bevelAngleOfGear-A"),
+			newData.get("bevelAngleOfGear-B"),
+			newData.get("TheComputedMeshInterference"),
+			newData.get("ReferenceRadiusOfGear-A"),
+			newData.get("ReferenceRadiusOfGear-B"),
+			newData.get("TipRadiusOfaGear-A"),
+			newData.get("TipRadiusOfaGear-B"),
+			newData.get("stl-a-Location"),
+			newData.get("stl-b-Location")
+			]
+//		return [gear,newData.get("baseRad"),newData.get("toothAngle"),newData.get("toothDepth")]
+	}
 	double baseThickness = toothBaseArchLen/Math.PI
 	axelAngle=Math.toRadians(axelAngleDegrees)
 	double bevelTriangleAngle = Math.PI-axelAngle
@@ -195,7 +246,7 @@ List<Object> makeBevelBox(Number numDriveTeeth,
 			Math.pow(numDrivenTeeth,2)-
 			2.0*numDrivenTeeth*numDriveTeeth*Math.cos(bevelTriangleAngle)
 			)
-	//￼￼￼
+	//
 	double Kvalue = numDrivenTeeth*numDriveTeeth*Math.sin(bevelTriangleAngle)/2.0
 	double height = 2*Kvalue/lengthOfBevelCenter
 
@@ -204,8 +255,7 @@ List<Object> makeBevelBox(Number numDriveTeeth,
 	double bevelAngleB = Math.acos(height/numDriveTeeth)
 	double face  = (thickness-baseThickness)/Math.sin(bevelAngle)
 	double otherThick = face*Math.sin(bevelAngleB)+baseThickness
-	if(	 pressureAngle==null)
-		pressureAngle=14.5
+	
 	//println "\n\nHeight "+(thickness-baseThickness)
 	//println "Face "+face
 	//println "Other Thickness "+otherThick
@@ -232,6 +282,35 @@ List<Object> makeBevelBox(Number numDriveTeeth,
 
 	CSG gearAFinal = gearA.get(0)
 	double ratio = (gearA.get(1)-meshInterference/2)/(gearB.get(1)-meshInterference/2)
+	
+	FileUtil.write(Paths.get(cacheSTLA.toURI()),
+		gearAFinal.toStlString());
+	FileUtil.write(Paths.get(cacheSTLB.toURI()),
+		gearBFinal.toStlString());
+	HashMap<String, HashMap<String, Object>> database= new HashMap<String, HashMap<String, Object>>()
+	HashMap<String, Object> newData = new HashMap<>()
+	newData.put("gearCenterToCenterX",aDiam)
+	newData.put("GearCenterToAxilZ",bDiam)
+	newData.put("bevelAngleInDegrees",Math.toDegrees(bevelAngle))
+	newData.put("faceLength",face)
+	newData.put("ThicknessOfComputedGear",otherThick)
+	newData.put("GearRatio",ratio)
+	newData.put("bevelAngleOfGear-A",gearA.get(2))
+	newData.put("bevelAngleOfGear-B",gearB.get(2))
+	newData.put("TheComputedMeshInterference",meshInterference)
+	newData.put("ReferenceRadiusOfGear-A",gearA.get(1))
+	newData.put("ReferenceRadiusOfGear-B",gearB.get(1))
+	newData.put("TipRadiusOfaGear-A",gearA.get(1)-meshInterference/2)
+	newData.put("TipRadiusOfaGear-B",gearB.get(1)-meshInterference/2)
+	newData.put("stl-a-Location",cacheSTLA.getAbsolutePath())
+	newData.put("stl-b-Location",cacheSTLB.getAbsolutePath())
+	
+	//Add data to database
+	database.put("gearMetaData",newData)
+	String writeOut = gson.toJson(database, TT_mapStringString);
+	FileUtil.write(Paths.get(cachejson.toURI()),
+		writeOut);
+	
 	return [
 		gearAFinal,
 		//0 A CSG
