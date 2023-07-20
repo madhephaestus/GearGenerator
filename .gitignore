@@ -4,3 +4,10 @@
 /.classpath
 /cache/
 /*.class
+
+/.settings
+/.project
+/.classpath
+/.cproject
+/cache/
+/*.class
