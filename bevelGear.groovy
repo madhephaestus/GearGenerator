@@ -27,7 +27,9 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 			face+"-"+
 			helical+"-"+
 			pressureAngle
-//	File repoDir= ScriptingEngine.getRepositoryCloneDirectory("https://github.com/madhephaestus/GearGenerator.git")
+	println "Gear generating "+cacheName
+	File repoDir= ScriptingEngine.getRepositoryCloneDirectory("https://github.com/madhephaestus/GearGenerator.git")
+	println "From "+repoDir.absolutePath
 //	File cacheDir = new File(repoDir.getAbsolutePath()+"/cache/")
 //	if(!cacheDir.exists())
 //		cacheDir.mkdir()
@@ -101,19 +103,19 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 		blank=blank.difference(toothCutter.rotz(toothAngle*i))
 	}
 
-	FileUtil.write(Paths.get(cacheSTL.toURI()),
-			blank.toStlString());
+//	FileUtil.write(Paths.get(cacheSTL.toURI()),
+//			blank.toStlString());
 	
 	HashMap<String, HashMap<String, Object>> database= new HashMap<String, HashMap<String, Object>>()
 	HashMap<String, Object> newData = new HashMap<>()
 	newData.put("baseRad",baseDiam/2)
 	newData.put("toothAngle",toothAngle)
 	newData.put("toothDepth",toothDepth)
-	newData.put("stlLocation",cacheSTL.getAbsolutePath())
+	//newData.put("stlLocation",cacheSTL.getAbsolutePath())
 	database.put("gearMetaData",newData)
 	String writeOut = gson.toJson(database, TT_mapStringString);
-	FileUtil.write(Paths.get(cachejson.toURI()),
-		writeOut);
+//	FileUtil.write(Paths.get(cachejson.toURI()),
+//		writeOut);
 	//println writeOut+"\r\n"+cachejson.toURI()
 	return [
 		blank//.union(toothCutter)
@@ -365,13 +367,13 @@ def bevelGears = makeBevelBox([
 ])
 
 //Print parameters returned by the script
-println "Bevel gear axil center to center " + bevelGears.get(2)
-println "Bevel gear axil Height " + bevelGears.get(3)
-println "Bevel angle " + bevelGears.get(4)
-println "Bevel tooth face length " + bevelGears.get(5)
-println "Gear B computed thickness " + bevelGears.get(6)
-println "Gear Ratio " + bevelGears.get(7)
-println "Mesh Interference calculated: " + bevelGears.get(9)
+//println "Bevel gear axil center to center " + bevelGears.get(2)
+//println "Bevel gear axil Height " + bevelGears.get(3)
+//println "Bevel angle " + bevelGears.get(4)
+//println "Bevel tooth face length " + bevelGears.get(5)
+//println "Gear B computed thickness " + bevelGears.get(6)
+//println "Gear Ratio " + bevelGears.get(7)
+//println "Mesh Interference calculated: " + bevelGears.get(9)
 // return the CSG parts
 //return bevelGears
 return [
