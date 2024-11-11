@@ -27,23 +27,23 @@ List<Object>  makeGear(double numTeeth,double thickness,double bevelAngle,double
 			face+"-"+
 			helical+"-"+
 			pressureAngle
-	File repoDir= ScriptingEngine.getRepositoryCloneDirectory("https://github.com/madhephaestus/GearGenerator.git")
-	File cacheDir = new File(repoDir.getAbsolutePath()+"/cache/")
-	if(!cacheDir.exists())
-		cacheDir.mkdir()
-	File cacheSTL = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".stl")
-	File cachejson = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".json")
-	if(cacheSTL.exists() && cachejson.exists()) {
-		println "Loading cached gear "+cacheName
-		CSG gear = Vitamins.get(cacheSTL);
-		String jsonString = null;
-		InputStream inPut = null;
-		inPut = FileUtils.openInputStream(cachejson);
-		jsonString = IOUtils.toString(inPut);
-		HashMap<String, HashMap<String, Object>> database = gson.fromJson(jsonString, TT_mapStringString);
-		HashMap<String, Object> newData = database.get("gearMetaData")
-		return [gear,newData.get("baseRad"),newData.get("toothAngle"),newData.get("toothDepth")]
-	}
+//	File repoDir= ScriptingEngine.getRepositoryCloneDirectory("https://github.com/madhephaestus/GearGenerator.git")
+//	File cacheDir = new File(repoDir.getAbsolutePath()+"/cache/")
+//	if(!cacheDir.exists())
+//		cacheDir.mkdir()
+//	File cacheSTL = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".stl")
+//	File cachejson = new File(cacheDir.getAbsolutePath()+"/"+cacheName+".json")
+//	if(cacheSTL.exists() && cachejson.exists()) {
+//		println "Loading cached gear "+cacheName
+//		CSG gear = Vitamins.get(cacheSTL);
+//		String jsonString = null;
+//		InputStream inPut = null;
+//		inPut = FileUtils.openInputStream(cachejson);
+//		jsonString = IOUtils.toString(inPut);
+//		HashMap<String, HashMap<String, Object>> database = gson.fromJson(jsonString, TT_mapStringString);
+//		HashMap<String, Object> newData = database.get("gearMetaData")
+//		return [gear,newData.get("baseRad"),newData.get("toothAngle"),newData.get("toothDepth")]
+//	}
 
 
 	double toothAngle = (360.0)/numTeeth
